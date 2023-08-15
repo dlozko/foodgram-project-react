@@ -3,7 +3,7 @@ from django_filters.rest_framework import CharFilter, FilterSet, filters
 from app.models import Ingredient, Recipe, Tag
 
 
-class RecipeFilter(FilterSet):
+class FilterRecipeFilter(FilterSet):
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
@@ -30,7 +30,7 @@ class RecipeFilter(FilterSet):
         return queryset
 
 
-class IngredientFilter(FilterSet):
+class FilterIngredient(FilterSet):
     name = CharFilter(lookup_expr='istartswith')
 
     class Meta:
