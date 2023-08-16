@@ -141,7 +141,8 @@ class Favorite(models.Model):
         return f'{self.user.username} добавил {self.recipe.name} в избраннное'
 
 
-class ShoppingCart(models.Model):
+class ShopCart(models.Model):
+    '''Модель корзины покупок'''
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -163,10 +164,10 @@ class ShoppingCart(models.Model):
                 name='unique_user_recipe_cart'
             )
         ]
-        verbose_name = 'Список покупок'
-        verbose_name_plural = 'Списки покупок'
+        verbose_name = 'Корзина покупок'
+        verbose_name_plural = 'Корзина покупок'
         
     
     def __str__(self):
         return (f'{self.user.username} добавил'
-                f'{self.recipe.name} в список покупок')
+                f'{self.recipe.name} в корзину покупок')
