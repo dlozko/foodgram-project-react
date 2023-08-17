@@ -1,3 +1,4 @@
+import re
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -54,7 +55,7 @@ class Follow(models.Model):
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
         constraints = [models.UniqueConstraint(
-            fields=['user', 'author'], name='unique_followers')]
+            fields=['user', 'author'], name='unique_user_author')]
     
     def __str__(self):
         return f'{self.user.username} подписан на {self.author.username}'

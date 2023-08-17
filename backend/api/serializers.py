@@ -4,7 +4,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.fields import SerializerMethodField
 
 from app.models import Ingredient, Recipe, Tag
-from users.models import User, Subscription
+from users.models import User, Follow
 
 
 class UserSignUpSerializer(UserCreateSerializer):
@@ -14,8 +14,8 @@ class UserSignUpSerializer(UserCreateSerializer):
                   'last_name', 'password')
 
 
-class UserGetSerializer(UserSerializer):
-    '''Сериалайзер для модели User.'''
+class UserSerializer(UserSerializer):
+    '''Сериализатор для модели User.'''
     is_subscribed = SerializerMethodField(read_only=True)
     class Meta:
         model = User
@@ -26,36 +26,32 @@ class UserGetSerializer(UserSerializer):
         user = self.context.get('request').user
         if user is None or user.is_anonymous:
             return False
-        return Subscription.objects.filter(
+        return Follow.objects.filter(
             user=user,
             author=obj
         ).exists()
 
 
-class RecipeSmallSerializer(serializers.ModelSerializer):
+class RecipeFavoriteSerializer(serializers.ModelSerializer):
     '''Сериализатор ответа при добавлении рецепта в избранное'''
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
     
 
-class UserSubscribeRepresentSerializer(serializers.ModelSerializer):
+class UserSubscribeListSerializer(serializers.ModelSerializer):
+    """ Сериализатор для получения подписок """
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'is_subscribed', 'recipes', 'recipes_count')
-        read_only_fields = ('email', 'username', 'first_name', 'last_name',
-                            'is_subscribed', 'recipes', 'recipes_count')
-    
-    def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        return (request and request.user.is_authenticated
-                and Subscription.objects.filter(
-                    user=request.user, author=obj
-                ).exists())
+                  'last_name', 'is_subscribed', 'recipes',
+                  'recipes_count')
+        read_only_fields = ('email', 'username', 'first_name',
+                            'last_name', 'is_subscribed',
+                            'recipes', 'recipes_count')
     
     def get_recipes(self, obj):
         request = self.context.get('request')
@@ -65,7 +61,8 @@ class UserSubscribeRepresentSerializer(serializers.ModelSerializer):
         recipes = obj.recipes.all()
         if recipes_limit:
             recipes = obj.recipes.all()[:int('recipes_limit')]
-        return RecipeSmallSerializer(recipes, many=True).data
+        return RecipeFavoriteSerializer(recipes, many=True,
+                                     context={'request':request}).data
 
 
     def get_recipes_count(self, obj):
@@ -74,11 +71,11 @@ class UserSubscribeRepresentSerializer(serializers.ModelSerializer):
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Subscription
+        model = Follow
         fields = ('user', 'author')
         validators = [
             UniqueTogetherValidator(
-            queryset=Subscription.objects.all(),
+            queryset=Follow.objects.all(),
             fields=('user', 'author'),
             message='Вы уже подписаны на этого пользователя'
             )
@@ -88,7 +85,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if data['author'] == data['user']:
             raise serializers.ValidationError(
-                'Нельзя подписываться на самого себя!'
+                'Нельзя подписываться на себя!'
             )
         return data
 
@@ -97,10 +94,11 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 class TagSerialiser(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = '__all__'
+        fields = ('id', 'name', 'color', 'slug'
+        )
 
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = '__all__'
+        fields = ('id', 'name', 'measurement_unit', 'amount')
