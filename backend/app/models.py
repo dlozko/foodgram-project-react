@@ -82,7 +82,7 @@ class Recipe(models.Model):
         return self.name
 
 
-class RecipeIngredient(models.Model):
+class IngredientRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -110,7 +110,7 @@ class RecipeIngredient(models.Model):
         verbose_name_plural = 'Ингредиенты в рецепте'
 
 
-class Favorite(models.Model):
+class Favorities(models.Model):
     '''Модель для избранных рецептов'''
     user = models.ForeignKey(
         User,
@@ -141,7 +141,7 @@ class Favorite(models.Model):
         return f'{self.user.username} добавил {self.recipe.name} в избраннное'
 
 
-class ShopCart(models.Model):
+class ShoppingList(models.Model):
     '''Модель корзины покупок'''
     user = models.ForeignKey(
         User,
