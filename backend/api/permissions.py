@@ -1,12 +1,13 @@
-from django.conf import settings
-from rest_framework import permissions
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
-class CurrentUserOrSuperuserOrReadOnly(permissions.BasePermission):
+class IsAdminAuthorOrReadOnly(BasePermission):
     def has_permission(self, request, view):
-        return ((request.path_info == settings.USER_ME_PATH
-             and request.user.is_authenticated) or
-             (request.path_info != settings.USER_ME_PATH
-              and request.method in permissions.SAFE_METHODS
-              or request.user.is_superuser
-              or request.user.is_staff))
+        return (request.method in SAFE_METHODS
+                or request.user.is_authenticated)
+
+    def has_object_permission(self, request, view, obj):
+        return (request.method in SAFE_METHODS
+                or request.user.is_superuser
+                or request.user.is_staff
+                or obj.author == request.user)

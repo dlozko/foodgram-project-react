@@ -39,7 +39,7 @@ class RecipeFavoriteSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
     
 
-class UserSubscribeListSerializer(serializers.ModelSerializer):
+class UserSubscribeListSerializer(UserSerializer):
     """ Сериализатор для получения подписок """
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
