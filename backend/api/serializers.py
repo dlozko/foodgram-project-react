@@ -66,7 +66,7 @@ class UserSubscribeListSerializer(UserSerializer):
             recipes_limit = request.query_params.get('recipes_limit')
         recipes = obj.recipes.all()
         if recipes_limit:
-            recipes = obj.recipes.all()[:int('recipes_limit')]
+            recipes = obj.recipes.all()[:int(recipes_limit)]
         return RecipeFavoriteSerializer(recipes, many=True,
                                      context={'request':request}).data
 
