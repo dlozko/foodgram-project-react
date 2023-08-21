@@ -14,6 +14,7 @@ from users.models import User, Follow
 
 
 class UserNewSerializer(UserCreateSerializer):
+    '''Сериализатор для регистрации новых пользователей.'''
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name',
@@ -61,14 +62,15 @@ class UserSubscribeListSerializer(UserSerializer):
     
     def get_recipes(self, obj):
         request = self.context.get('request')
-        recipes_limit = None
-        if request:
-            recipes_limit = request.query_params.get('recipes_limit')
+        limit = None
         recipes = obj.recipes.all()
-        if recipes_limit:
-            recipes = obj.recipes.all()[:int(recipes_limit)]
-        return RecipeFavoriteSerializer(recipes, many=True,
-                                     context={'request':request}).data
+        if request:
+            limit = request.GET.get('recipes_limit')
+        if limit:
+            recipes = obj.recipes.all()[:int(limit)]
+        serializer = RecipeFavoriteSerializer(recipes, many=True,
+                                     context={'request':request})
+        return serializer.data
 
 
     def get_recipes_count(self, obj):
@@ -83,17 +85,17 @@ class SubscriptionSerializer(ModelSerializer):
             UniqueTogetherValidator(
             queryset=Follow.objects.all(),
             fields=('user', 'author'),
-            message='Вы уже подписаны на этого пользователя'
+            message='Подписка уже существует'
             )
         ]
     
     def validate(self, data):
-        request = self.context.get('request')
-        if data['author'] == data['user']:
+        request = self.context.get('request').user
+        if data['author'] == request:
             raise ValidationError(
-                'Нельзя подписываться на себя!'
-            )
+                'Нельзя подписаться на самого себя')
         return data
+
 
 
 
@@ -151,14 +153,14 @@ class RecipeReadSerializer(ModelSerializer):
         return (request and request.user.is_authenticated
                 and Favorities.objects.filter(
                     user=request.user, recipe=obj
-                )).exists()
+                ).exists())
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
         return (request and request.user.is_authenticated
                 and ShoppingList.objects.filter(
                     user=request.user, recipe=obj
-                )).exists()
+                ).exists())
 
 
 class RecipeCreateSerializer(ModelSerializer):
