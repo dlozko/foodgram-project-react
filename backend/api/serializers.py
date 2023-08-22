@@ -96,14 +96,16 @@ class SubscriptionSerializer(ModelSerializer):
                 'Нельзя подписаться на самого себя')
         return data
 
-
+    def to_representation(self, instance):
+        return UserSubscribeListSerializer(instance.author,
+            context={'request': self.context.get('request')
+        }).data
 
 
 class TagSerialiser(ModelSerializer):
     class Meta:
         model = Tag
-        fields = ('id', 'name', 'color', 'slug'
-        )
+        fields = ('id', 'name', 'color', 'slug')
 
 
 class IngredientSerializer(ModelSerializer):
@@ -186,14 +188,32 @@ class RecipeCreateSerializer(ModelSerializer):
             )
         return data
 
+    @staticmethod
+    def create_ingredients(recipe, ingredients):
+        ingredient_liist = []
+        for ingredient_data in ingredients:
+            current_ingredient = get_object_or_404(Ingredient, id=ingredient_data.get('id'))
+            ingredient_liist.append(
+                IngredientRecipe(
+                    ingredient=current_ingredient,
+                    amount=ingredient_data.get['amount'],
+                    recipe=recipe,
+                )
+            )
+        IngredientRecipe.objects.bulk_create(ingredient_liist)
+
     def create(self, validated_data):
         request = self.context.get('request')
         ingredients = validated_data.pop('recipeingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(author=request.user, **validated_data)
         recipe.tags.set(tags)
-        for ingredient in ingredients:
-            current_ingredient = get_object_or_404(Ingredient, id=ingredient.get('id'))
-            amount = ingredient.get('amount')
-            IngredientRecipe.objects.create(recipe=recipe, ingredient=current_ingredient, amount=amount)
+        self.create_ingredients(recipe, ingredients)
         return recipe
+
+    def update(self, instance, validated_data):
+        ingredients = validated_data.pop('recipeingredients')
+        tags = validated_data.pop('tags')
+        instance.tags.clear()
+        instance.tags.set(tags)
+        IngredientRecipe.objects.filter(recipe=instance).delete()
