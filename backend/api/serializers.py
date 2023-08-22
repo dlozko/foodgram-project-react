@@ -1,9 +1,12 @@
+import base64
+from django.core.files.base import ContentFile
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework.serializers import (ModelSerializer,
                                         SerializerMethodField,
                                         PrimaryKeyRelatedField,
                                         ValidationError, CharField,
-                                        IntegerField)                                       
+                                        IntegerField, ImageField)                                       
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.fields import SerializerMethodField
 
@@ -134,6 +137,16 @@ class IngredientAddSerializer(ModelSerializer):
         fields = ('id', 'amount')
 
 
+class Base64ImageField(ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')  
+            ext = format.split('/')[-1]  
+            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
+        return super().to_internal_value(data)
+
+
 class RecipeReadSerializer(ModelSerializer):
     tags = TagSerialiser(read_only=True, many=True)
     author = UserSerializer(read_only=True)
@@ -179,14 +192,18 @@ class RecipeCreateSerializer(ModelSerializer):
                   'ingredients', 'text', 'cooking_time')
 
     def validate(self, data):
-        tags_list = []
+        ingredients_list = []
         for ingredient in data.get('recipeingredients'):
-            tags_list.append(ingredient.get('id'))
-        if len(set(tags_list)) != len(tags_list):
+            if int(ingredient.get('amount')) < 1:
+                raise ValidationError(
+                    'Количество ингредиента должно быть больше 0')
+            ingredients_list.append(ingredient.get('id'))
+        if len(set(ingredients_list)) != len(ingredients_list):
             raise ValidationError(
-                'Вы пытаетесь добавить в рецепт два одинаковых ингредиента'
+                'Есть одинаковые ингредиенты'
             )
         return data
+
 
     @staticmethod
     def create_ingredients(recipe, ingredients):
@@ -217,3 +234,33 @@ class RecipeCreateSerializer(ModelSerializer):
         instance.tags.clear()
         instance.tags.set(tags)
         IngredientRecipe.objects.filter(recipe=instance).delete()
+        instance.image = validated_data.get('image', instance.name)
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
+        self.create_ingredients(ingredients, instance)
+        instance.save()
+        return instance
+
+    def to_representation(self, instance):
+        return RecipeReadSerializer(instance,
+            context={'request': self.context.get('request')
+            }).data
+    
+class ShoppingCartSerializer(ModelSerializer):
+    class Meta:
+        model = ShoppingList
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+            queryset=ShoppingList.objects.all(),
+            fields=('user', 'recipe'),
+            message='Рецепт уже добавлен в список покупок'
+            )
+        ]
+
+    def to_representation(self, instance):
+        return RecipeFavoriteSerializer(
+            instance.recipe,
+            context = {'request': self.context.get('request')
+        }).data

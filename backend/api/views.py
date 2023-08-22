@@ -2,16 +2,19 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import viewsets, status, mixins
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import AllowAny
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from .filters import RecipeFilter, FilterIngredient
 from .permissions import IsAdminAuthorOrReadOnly
-from .serializers import (IngredientSerializer, TagSerialiser,
+from .serializers import (FavoriteSerializer , IngredientSerializer, TagSerialiser,
                              UserSubscribeListSerializer,
                              SubscriptionSerializer,
                              RecipeCreateSerializer,
                              RecipeReadSerializer)
-from app.models import Ingredient, Tag, Recipe
+from app.models import Ingredient, Tag, Recipe, Favorities
 from users.models import Follow, User
 
 
@@ -50,7 +53,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny, )
     filter_backends = (DjangoFilterBackend, )
-    filterset_class = IngredientFilter
+    filterset_class = FilterIngredient
     pagination_class = None
 
 
@@ -67,7 +70,36 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminAuthorOrReadOnly, )
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
             return RecipeReadSerializer
         return RecipeCreateSerializer
+
+    @action(
+            detail=True,
+            methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated, ]
+    )
+    def favorite(self, request, pk):
+        recipe = get_object_or_404(Recipe, id=pk)
+        if request.method == 'POST':
+            serializer = FavoriteSerializer(
+                data={'user': request.user.id, 'recipe': recipe.id},
+                context={'request': request}
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        if request.method == 'DELETE':
+            if not Favorities.objects.filter(user=request.user, recipe=recipe).exists():
+                return Response(
+                    {'errors': 'У вас нет этого рецепта в избранном'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            Favorities.objects.filter(user=request.user, recipe=recipe).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        
+        

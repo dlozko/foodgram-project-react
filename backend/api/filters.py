@@ -3,18 +3,20 @@ from django_filters.rest_framework import CharFilter, FilterSet, filters
 from app.models import Ingredient, Recipe, Tag
 
 
-class FilterRecipeFilter(FilterSet):
-    tags = filters.ModelMultipleChoiceFilter(
-        field_name='tags__slug',
-        to_field_name='slug',
-        queryset=Tag.objects.all(),
-    )
+class RecipeFilter(FilterSet):
+    """Фильтр выборки рецептов по определенным полям."""
     is_favorited = filters.BooleanFilter(
         method='get_is_favorited'
     )
     is_in_shopping_cart = filters.BooleanFilter(
         method='get_is_in_shopping_cart'
     )
+    tags = filters.ModelMultipleChoiceFilter(
+        field_name='tags__slug',
+        to_field_name='slug',
+        queryset=Tag.objects.all(),
+    )
+        
     class Meta:
         model = Recipe
         fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
