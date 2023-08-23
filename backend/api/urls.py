@@ -5,15 +5,16 @@ from api.views import (IngredientViewSet, TagViewSet, UserSubscribeView,
                        UserSubscriptionsViewSet, RecipeViewSet, TagViewSet,)
 
 
-v1_router = DefaultRouter()
+router_v1 = DefaultRouter()
 
-v1_router.register(r'tags', TagViewSet, basename='tags')
-v1_router.register(r'ingredients', IngredientViewSet, basename='ingredients')
-v1_router.register(r'recipes', RecipeViewSet, basename='recipes')
+router_v1.register(r'tags', TagViewSet, basename='tags')
+router_v1.register(r'ingredients', IngredientViewSet, basename='ingredients')
+router_v1.register(r'recipes', RecipeViewSet, basename='recipes')
 
-urlpatterns = [
+urlpatterns = [path('users/subscriptions/',
+                    UserSubscriptionsViewSet.as_view({'get': 'list'})),
     path('users/<int:user_id>/subscribe/', UserSubscribeView.as_view()),
-    path('', include(v1_router.urls)),
+    path('', include(router_v1.urls)),
     path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
 ]

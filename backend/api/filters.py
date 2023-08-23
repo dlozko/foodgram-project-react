@@ -32,7 +32,7 @@ class RecipeFilter(FilterSet):
         return queryset
 
 
-class FilterIngredient(FilterSet):
+class IngredientFilter(FilterSet):
     name = CharFilter(lookup_expr='istartswith')
 
     class Meta:

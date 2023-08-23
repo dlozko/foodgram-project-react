@@ -10,7 +10,7 @@ from rest_framework.serializers import (ModelSerializer,
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.fields import SerializerMethodField
 from app.models import (Tag, Ingredient, Recipe, IngredientRecipe,
-                        Favorities, ShoppingList, )
+                        Favorite, ShoppingList, )
 from users.models import User, Follow
 
 
@@ -164,7 +164,7 @@ class RecipeReadSerializer(ModelSerializer):
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         return (request and request.user.is_authenticated
-                and Favorities.objects.filter(
+                and Favorite.objects.filter(
                     user=request.user, recipe=obj
                 ).exists())
 
@@ -262,3 +262,4 @@ class ShoppingListSerializer(ModelSerializer):
             instance.recipe,
             context = {'request': self.context.get('request')
         }).data
+    

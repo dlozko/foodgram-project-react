@@ -110,7 +110,7 @@ class IngredientRecipe(models.Model):
         verbose_name_plural = 'Ингредиенты в рецепте'
 
 
-class Favorities(models.Model):
+class Favorite(models.Model):
     '''Модель для избранных рецептов'''
     user = models.ForeignKey(
         User,
