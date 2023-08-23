@@ -9,8 +9,6 @@ from rest_framework.serializers import (ModelSerializer,
                                         IntegerField, ImageField)                                       
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.fields import SerializerMethodField
-
-from api.utils import Base64ImageField
 from app.models import (Tag, Ingredient, Recipe, IngredientRecipe,
                         Favorities, ShoppingList, )
 from users.models import User, Follow
@@ -247,15 +245,15 @@ class RecipeCreateSerializer(ModelSerializer):
             context={'request': self.context.get('request')
             }).data
     
-class ShoppingCartSerializer(ModelSerializer):
+class ShoppingListSerializer(ModelSerializer):
     class Meta:
         model = ShoppingList
-        fields = '__all__'
+        fields = ('user', 'recipe')
         validators = [
             UniqueTogetherValidator(
             queryset=ShoppingList.objects.all(),
             fields=('user', 'recipe'),
-            message='Рецепт уже добавлен в список покупок'
+            message='Рецепт уже добавлен в корзину'
             )
         ]
 
