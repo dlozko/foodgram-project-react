@@ -29,7 +29,7 @@ class UserSerializer(UserSerializer):
         model = User
         fields = ('email', 'id', 'username', 'first_name',
                   'last_name', 'is_subscribed')
-    
+
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
         if user is None or user.is_anonymous:
@@ -45,7 +45,7 @@ class RecipeFavoriteSerializer(ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
-    
+
 
 class UserSubscribeListSerializer(UserSerializer):
     """ Сериализатор для получения подписок """
@@ -84,12 +84,12 @@ class SubscriptionSerializer(ModelSerializer):
         fields = ('user', 'author')
         validators = [
             UniqueTogetherValidator(
-            queryset=Follow.objects.all(),
-            fields=('user', 'author'),
-            message='Подписка уже существует'
+                queryset=Follow.objects.all(),
+                fields=('user', 'author'),
+                message='Подписка уже существует'
             )
         ]
-    
+
     def validate(self, data):
         request = self.context.get('request').user
         if data['author'] == request:
@@ -244,7 +244,7 @@ class RecipeCreateSerializer(ModelSerializer):
         return RecipeReadSerializer(instance,
             context={'request': self.context.get('request')
             }).data
-    
+
 class ShoppingListSerializer(ModelSerializer):
     class Meta:
         model = ShoppingList
@@ -262,4 +262,3 @@ class ShoppingListSerializer(ModelSerializer):
             instance.recipe,
             context = {'request': self.context.get('request')
         }).data
-    

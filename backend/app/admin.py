@@ -1,9 +1,8 @@
-from django.conf import settings
 from django.contrib import admin
 
 from .models import (Tag, Ingredient,
-                     Recipe, RecipeIngredient,
-                     Favorite, ShopCart)
+                     Recipe, IngredientRecipe,
+                     Favorite, ShoppingList)
 
 
 class TagAdmin(admin.ModelAdmin):
@@ -21,10 +20,13 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'author')
+    list_display = ('pk', 'name', 'author', 'favorites_amount')
     search_fields = ('name', 'author')
     list_filter = ('name', 'author', 'tags')
     empty_value_display = '-пусто-'
+
+    def favorites_amount(self, obj):
+        return obj.favorites.count()
 
 
 class RecipeIngredientAdmin(admin.ModelAdmin):
@@ -47,6 +49,6 @@ class ShopCartAdmin(admin.ModelAdmin):
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)
-admin.site.register(RecipeIngredient, RecipeIngredientAdmin)
+admin.site.register(IngredientRecipe, RecipeIngredientAdmin)
 admin.site.register(Favorite, FavoriteAdmin)
-admin.site.register(ShopCart, ShopCartAdmin)
+admin.site.register(ShoppingList, ShopCartAdmin)

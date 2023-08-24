@@ -105,13 +105,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[IsAuthenticated, ]
     )
     def download_shopping_cart(self, request):
-        ingredients = IngredientRecipe.objects.filter(
+        ingredient_lst = IngredientRecipe.objects.filter(
             recipe__carts__user=request.user
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(ingredient_amount=Sum('amount'))
         shopping_list = ['Список покупок:\n']
-        for ingredient in ingredients:
+        for ingredient in ingredient_lst:
             name = ingredient['ingredient__name']
             unit = ingredient['ingredient__measurement_unit']
             amount = ingredient['ingredient_amount']
