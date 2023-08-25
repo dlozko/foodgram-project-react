@@ -245,20 +245,40 @@ class RecipeCreateSerializer(ModelSerializer):
             context={'request': self.context.get('request')
             }).data
 
-class ShoppingListSerializer(ModelSerializer):
+
+class FavoriteSerializer(ModelSerializer):
     class Meta:
-        model = ShoppingList
+        model = Favorite
         fields = ('user', 'recipe')
         validators = [
             UniqueTogetherValidator(
-            queryset=ShoppingList.objects.all(),
-            fields=('user', 'recipe'),
-            message='Рецепт уже добавлен в корзину'
+                queryset=Favorite.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже добавлен в избранное'
             )
         ]
 
     def to_representation(self, instance):
         return RecipeFavoriteSerializer(
             instance.recipe,
-            context = {'request': self.context.get('request')
+            context={'request': self.context.get('request')
+        }).data
+
+
+class ShoppingListSerializer(ModelSerializer):
+    class Meta:
+        model = ShoppingList
+        fields = ('user', 'recipe')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ShoppingList.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже добавлен в корзину'
+            )
+        ]
+
+    def to_representation(self, instance):
+        return RecipeFavoriteSerializer(
+            instance.recipe,
+            context={'request': self.context.get('request')
         }).data
