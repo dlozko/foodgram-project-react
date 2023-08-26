@@ -34,8 +34,7 @@ class UserSerializer(UserSerializer):
         user = self.context.get('request').user
         if user is None or user.is_anonymous:
             return False
-        return Follow.objects.filter(
-            user=user,
+        return Follow.objects.filter(user=user,
             author=obj
         ).exists()
 
@@ -232,10 +231,7 @@ class RecipeCreateSerializer(ModelSerializer):
         instance.tags.clear()
         instance.tags.set(tags)
         IngredientRecipe.objects.filter(recipe=instance).delete()
-        instance.image = validated_data.get('image', instance.name)
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
+        super().update(instance, validated_data)
         self.create_ingredients(ingredients, instance)
         instance.save()
         return instance

@@ -20,9 +20,13 @@ class User(AbstractUser):
                                  null=False)
     email = models.EmailField('Email',
                               unique=True,
-                              max_length=254,
+                              max_length=200,
                               blank=False,
                               null=False)
+    password = models.CharField('Пароль',
+                                max_length=150,
+                                blank=False,
+                                null=False)
 
     class Meta:
         verbose_name = 'Пользователь'
