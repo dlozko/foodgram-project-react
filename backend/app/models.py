@@ -51,7 +51,7 @@ class Recipe(models.Model):
                             max_length=1000)
     ingredients = models.ManyToManyField(
         Ingredient,
-        through='RecipeIngredient',
+        through='IngredientRecipe',
         verbose_name='Ингредиенты',
     )
     author = models.ForeignKey(User,
