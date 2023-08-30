@@ -9,7 +9,7 @@ from rest_framework.serializers import (ModelSerializer,
                                         IntegerField, ImageField)                                       
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.fields import SerializerMethodField
-from app.models import (Tag, Ingredient, Recipe, IngredientRecipe,
+from recipes.models import (Tag, Ingredient, Recipe, IngredientRecipe,
                         Favorite, ShoppingList, )
 from users.models import User, Follow
 

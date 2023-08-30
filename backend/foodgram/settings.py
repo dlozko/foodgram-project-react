@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-$v%pc&4uu_x#&_k8%y9b79!t3p9l39e96m&t3yacc0pu^26((m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'users.apps.UsersConfig',
-    'app.apps.AppConfig',
+    'recipes.apps.RecipesConfig',
     'api.apps.ApiConfig',
     'django_filters',
 ]
