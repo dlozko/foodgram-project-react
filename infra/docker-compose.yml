@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 volumes:
   static:
@@ -8,7 +8,7 @@ volumes:
 services:
 
   db:
-    image: postgres:13.0-alpine
+    image: postgres:13
     volumes:
       - pg_data:/var/lib/postgresql/data/
     env_file:
@@ -22,7 +22,7 @@ services:
     depends_on:
       - db
     volumes:
-      - static:/app/static/
+      - static:/app/static
       - media:/app/media/
 
   frontend:
