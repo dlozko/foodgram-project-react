@@ -1,3 +1,4 @@
+from django.db import transaction
 import base64
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
@@ -35,8 +36,7 @@ class UserSerializer(UserSerializer):
         if user is None or user.is_anonymous:
             return False
         return Follow.objects.filter(user=user,
-            author=obj
-        ).exists()
+            author=obj).exists()
 
 
 class RecipeFavoriteSerializer(ModelSerializer):
@@ -105,13 +105,13 @@ class SubscriptionSerializer(ModelSerializer):
 class TagSerialiser(ModelSerializer):
     class Meta:
         model = Tag
-        fields = ('id', 'name', 'color', 'slug')
+        fields = '__all__'
 
 
 class IngredientSerializer(ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ('id', 'name', 'measurement_unit', 'amount')
+        fields = '__all__'
 
 
 class IngredientRecipeSerializer(ModelSerializer):
@@ -216,6 +216,7 @@ class RecipeCreateSerializer(ModelSerializer):
             )
         IngredientRecipe.objects.bulk_create(ingredient_liist)
 
+    @transaction.atomic
     def create(self, validated_data):
         request = self.context.get('request')
         ingredients = validated_data.pop('recipeingredients')
@@ -225,6 +226,7 @@ class RecipeCreateSerializer(ModelSerializer):
         self.create_ingredients(recipe, ingredients)
         return recipe
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('recipeingredients')
         tags = validated_data.pop('tags')

@@ -12,7 +12,7 @@ class Tag(models.Model):
     color = models.CharField('Цвет тега',
                              max_length=7,
                              unique=True,
-                             default='#',)
+                             default='#')
     slug = models.SlugField('Slug',
                             max_length=200,
                             unique=True)
@@ -47,7 +47,7 @@ class Recipe(models.Model):
     image = models.ImageField('Картинка',
                               upload_to='recipes/',
                               blank=True)
-    text = models.TextField('Описание',
+    text = models.TextField('Описание рецепта',
                             max_length=1000)
     ingredients = models.ManyToManyField(
         Ingredient,
@@ -74,7 +74,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ['-id']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
     
@@ -106,8 +106,8 @@ class IngredientRecipe(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингредиент в рецепте'
-        verbose_name_plural = 'Ингредиенты в рецепте'
+        verbose_name = 'Ингредиент рецепта'
+        verbose_name_plural = 'Ингредиенты рецепта'
 
 
 class Favorite(models.Model):
