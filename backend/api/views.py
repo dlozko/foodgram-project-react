@@ -15,7 +15,7 @@ from .serializers import (FavoriteSerializer , IngredientSerializer,
                           SubscriptionSerializer, ShoppingListSerializer,
                           RecipeCreateSerializer, RecipeReadSerializer)
 from recipes.models import (Ingredient, Tag, Recipe, Favorite, ShoppingList,
-                        IngredientRecipe)
+                        RecipeIngredient)
 from users.models import Follow, User
 
 
@@ -105,7 +105,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[IsAuthenticated, ]
     )
     def download_shopping_cart(self, request):
-        ingredient_lst = IngredientRecipe.objects.filter(
+        ingredient_lst = RecipeIngredient.objects.filter(
             recipe__carts__user=request.user
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'

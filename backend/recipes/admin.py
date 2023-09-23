@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import (Tag, Ingredient,
-                     Recipe, IngredientRecipe,
+                     Recipe, RecipeIngredient,
                      Favorite, ShoppingList)
 
 
@@ -49,6 +49,6 @@ class ShopCartAdmin(admin.ModelAdmin):
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)
-admin.site.register(IngredientRecipe, RecipeIngredientAdmin)
+admin.site.register(RecipeIngredient, RecipeIngredientAdmin)
 admin.site.register(Favorite, FavoriteAdmin)
 admin.site.register(ShoppingList, ShopCartAdmin)

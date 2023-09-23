@@ -10,7 +10,7 @@ from rest_framework.serializers import (ModelSerializer,
                                         IntegerField, ImageField)                                       
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.fields import SerializerMethodField
-from recipes.models import (Tag, Ingredient, Recipe, IngredientRecipe,
+from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredient,
                         Favorite, ShoppingList, )
 from users.models import User, Follow
 
@@ -114,14 +114,14 @@ class IngredientSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class IngredientRecipeSerializer(ModelSerializer):
+class RecipeIngredientSerializer(ModelSerializer):
     id = IntegerField(read_only=True, source='ingredient.id')
     name = CharField(read_only=True, source='ingredient.name')
     measurement_unit = CharField(
         read_only=True, source='ingredient.measurement_unit')
 
     class Meta:
-        model = IngredientRecipe
+        model = RecipeIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
@@ -130,7 +130,7 @@ class IngredientAddSerializer(ModelSerializer):
     amount = IntegerField()
 
     class Meta:
-        model = IngredientRecipe
+        model = RecipeIngredient
         fields = ('id', 'amount')
 
 
@@ -147,7 +147,7 @@ class Base64ImageField(ImageField):
 class RecipeReadSerializer(ModelSerializer):
     tags = TagSerialiser(read_only=True, many=True)
     author = UserSerializer(read_only=True)
-    ingredients = IngredientRecipeSerializer(many=True, read_only=True,
+    ingredients = RecipeIngredientSerializer(many=True, read_only=True,
                                           source='recipeingredients')
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
@@ -208,13 +208,13 @@ class RecipeCreateSerializer(ModelSerializer):
         for ingredient_data in ingredients:
             current_ingredient = get_object_or_404(Ingredient, id=ingredient_data.get('id'))
             ingredient_liist.append(
-                IngredientRecipe(
+                RecipeIngredient(
                     ingredient=current_ingredient,
                     amount=ingredient_data.get['amount'],
                     recipe=recipe,
                 )
             )
-        IngredientRecipe.objects.bulk_create(ingredient_liist)
+        RecipeIngredient.objects.bulk_create(ingredient_liist)
 
     @transaction.atomic
     def create(self, validated_data):
@@ -232,7 +232,7 @@ class RecipeCreateSerializer(ModelSerializer):
         tags = validated_data.pop('tags')
         instance.tags.clear()
         instance.tags.set(tags)
-        IngredientRecipe.objects.filter(recipe=instance).delete()
+        RecipeIngredient.objects.filter(recipe=instance).delete()
         super().update(instance, validated_data)
         self.create_ingredients(ingredients, instance)
         instance.save()
