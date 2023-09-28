@@ -45,7 +45,7 @@ class UserSubscriptionsViewSet(mixins.ListModelMixin,
     serializer_class = UserSubscribeListSerializer
 
     def get_queryset(self):
-        return User.objects.filter(following__user=self.request.user)
+        return User.objects.filter(followings__user=self.request.user)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):

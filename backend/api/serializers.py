@@ -31,12 +31,17 @@ class UserSerializer(UserSerializer):
         fields = ('email', 'id', 'username', 'first_name',
                   'last_name', 'is_subscribed')
 
+#    def get_is_subscribed(self, obj):
+#        user = self.context.get('request').user
+#        if user is None or user.is_anonymous:
+#            return False
+#        return Follow.objects.filter(user=user,
+#            author=obj).exists()
     def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user is None or user.is_anonymous:
-            return False
-        return Follow.objects.filter(user=user,
-            author=obj).exists()
+        request = self.context.get('request')
+        return (request.user.is_authenticated
+                and Follow.objects.filter(
+                    user=request.user, author=obj).exists())
 
 
 class RecipeFavoriteSerializer(ModelSerializer):
@@ -60,17 +65,28 @@ class UserSubscribeListSerializer(UserSerializer):
                             'last_name', 'is_subscribed',
                             'recipes', 'recipes_count')
     
+    #def get_recipes(self, obj):
+    #    request = self.context.get('request')
+    #    limit = None
+    #    recipes = obj.recipes.all()
+    #    if request:
+    #        limit = request.GET.get('recipes_limit')
+    #    if limit:
+    #        recipes = obj.recipes.all()[:int(limit)]
+    #    serializer = RecipeFavoriteSerializer(recipes, many=True,
+    #                                 context={'request':request})
+    #    return serializer.data
     def get_recipes(self, obj):
         request = self.context.get('request')
-        limit = None
-        recipes = obj.recipes.all()
+        recipes_limit = None
         if request:
-            limit = request.GET.get('recipes_limit')
-        if limit:
-            recipes = obj.recipes.all()[:int(limit)]
-        serializer = RecipeFavoriteSerializer(recipes, many=True,
-                                     context={'request':request})
-        return serializer.data
+            recipes_limit = request.query_params.get('recipes_limit')
+        recipes = obj.recipes.all()
+        if recipes_limit:
+            recipes = obj.recipes.all()[:int(recipes_limit)]
+        return RecipeFavoriteSerializer(recipes, many=True,
+                                     context={'request': request}).data
+
 
 
     def get_recipes_count(self, obj):
@@ -80,7 +96,7 @@ class UserSubscribeListSerializer(UserSerializer):
 class SubscriptionSerializer(ModelSerializer):
     class Meta:
         model = Follow
-        fields = ('user', 'author')
+        fields = '__all__'
         validators = [
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
@@ -247,7 +263,7 @@ class RecipeCreateSerializer(ModelSerializer):
 class FavoriteSerializer(ModelSerializer):
     class Meta:
         model = Favorite
-        fields = ('user', 'recipe')
+        fields = '__all__'
         validators = [
             UniqueTogetherValidator(
                 queryset=Favorite.objects.all(),
@@ -266,7 +282,7 @@ class FavoriteSerializer(ModelSerializer):
 class ShoppingListSerializer(ModelSerializer):
     class Meta:
         model = ShoppingList
-        fields = ('user', 'recipe')
+        fields = '__all__'
         validators = [
             UniqueTogetherValidator(
                 queryset=ShoppingList.objects.all(),
