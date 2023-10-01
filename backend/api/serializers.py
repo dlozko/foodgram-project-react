@@ -31,17 +31,12 @@ class UserSerializer(UserSerializer):
         fields = ('email', 'id', 'username', 'first_name',
                   'last_name', 'is_subscribed')
 
-#    def get_is_subscribed(self, obj):
-#        user = self.context.get('request').user
-#        if user is None or user.is_anonymous:
-#            return False
-#        return Follow.objects.filter(user=user,
-#            author=obj).exists()
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        return (request.user.is_authenticated
-                and Follow.objects.filter(
-                    user=request.user, author=obj).exists())
+        user = self.context.get('request').user
+        if user is None or user.is_anonymous:
+            return False
+        return Follow.objects.filter(user=user,
+            author=obj).exists()
 
 
 class RecipeFavoriteSerializer(ModelSerializer):
@@ -65,29 +60,17 @@ class UserSubscribeListSerializer(UserSerializer):
                             'last_name', 'is_subscribed',
                             'recipes', 'recipes_count')
     
-    #def get_recipes(self, obj):
-    #    request = self.context.get('request')
-    #    limit = None
-    #    recipes = obj.recipes.all()
-    #    if request:
-    #        limit = request.GET.get('recipes_limit')
-    #    if limit:
-    #        recipes = obj.recipes.all()[:int(limit)]
-    #    serializer = RecipeFavoriteSerializer(recipes, many=True,
-    #                                 context={'request':request})
-    #    return serializer.data
     def get_recipes(self, obj):
         request = self.context.get('request')
-        recipes_limit = None
-        if request:
-            recipes_limit = request.query_params.get('recipes_limit')
+        limit = None
         recipes = obj.recipes.all()
-        if recipes_limit:
-            recipes = obj.recipes.all()[:int(recipes_limit)]
-        return RecipeFavoriteSerializer(recipes, many=True,
-                                     context={'request': request}).data
-
-
+        if request:
+            limit = request.GET.get('recipes_limit')
+        if limit:
+            recipes = obj.recipes.all()[:int(limit)]
+        serializer = RecipeFavoriteSerializer(recipes, many=True,
+                                     context={'request':request})
+        return serializer.data
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
@@ -226,7 +209,7 @@ class RecipeCreateSerializer(ModelSerializer):
             ingredient_liist.append(
                 RecipeIngredient(
                     ingredient=current_ingredient,
-                    amount=ingredient_data.get['amount'],
+                    amount=ingredient_data.get('amount'),
                     recipe=recipe,
                 )
             )

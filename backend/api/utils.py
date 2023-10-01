@@ -17,13 +17,3 @@ def delete_object(request, model_name, instance, error_message):
                 status=status.HTTP_404_BAD_REQUEST)
     model_name.objects.filter(user=request.user, recipe=instance).delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
-
-class DisableCSRFMiddleware(object):
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        setattr(request, '_dont_enforce_csrf_checks', True)
-        response = self.get_response(request)
-        return response
