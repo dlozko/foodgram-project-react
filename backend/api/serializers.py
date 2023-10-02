@@ -26,6 +26,7 @@ class UserNewSerializer(UserCreateSerializer):
 class UserSerializer(UserSerializer):
     '''Сериализатор для модели User.'''
     is_subscribed = SerializerMethodField(read_only=True)
+
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name',
@@ -194,6 +195,10 @@ class RecipeCreateSerializer(ModelSerializer):
                 raise ValidationError(
                     'Количество ингредиента должно быть больше 0')
             ingredients_list.append(ingredient.get('id'))
+         #   if ingredient.get('id') in ingredients_list:
+         #       raise ValidationError(
+         #           'Есть одинаковые ингредиенты!')
+         #   ingredients_list.append(ingredient.get('id'))
         if len(set(ingredients_list)) != len(ingredients_list):
             raise ValidationError(
                 'Есть одинаковые ингредиенты'
@@ -217,23 +222,21 @@ class RecipeCreateSerializer(ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        request = self.context.get('request')
         ingredients = validated_data.pop('recipeingredients')
-        tags = validated_data.pop('tags')
-        recipe = Recipe.objects.create(author=request.user, **validated_data)
-        recipe.tags.set(tags)
+        recipe = Recipe.objects.create(author=self.context.get('request').user,
+                                       **validated_data)
+        recipe.tags.set(validated_data.pop('tags'))
         self.create_ingredients(recipe, ingredients)
         return recipe
 
     @transaction.atomic
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('recipeingredients')
-        tags = validated_data.pop('tags')
         instance.tags.clear()
-        instance.tags.set(tags)
+        instance.tags.set(validated_data.pop('tags'))
         RecipeIngredient.objects.filter(recipe=instance).delete()
         super().update(instance, validated_data)
-        self.create_ingredients(ingredients, instance)
+        self.create_ingredients(instance, ingredients)
         instance.save()
         return instance
 

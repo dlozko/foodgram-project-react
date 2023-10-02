@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from .utils import create_object, delete_object
 from .filters import RecipeFilter, IngredientFilter
-from .permissions import IsAdminAuthorOrReadOnly
+from .permissions import IsAuthorAdminOrReadOnly
 from .serializers import (FavoriteSerializer , IngredientSerializer,
                           TagSerialiser, UserSubscribeListSerializer,
                           SubscriptionSerializer, ShoppingListSerializer,
@@ -68,7 +68,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = (IsAdminAuthorOrReadOnly, )
+    permission_classes = (IsAuthorAdminOrReadOnly, )
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
     http_method_names = ['get', 'post', 'patch', 'delete']
