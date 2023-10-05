@@ -3,7 +3,7 @@ from django.db.models import Sum
 from rest_framework import viewsets, status, mixins
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -20,18 +20,19 @@ from users.models import Follow, User
 
 
 class UserSubscribeView(APIView):
+
     def post(self, request, user_id):
-        author = get_object_or_404(User, id=user_id)
         serializer = SubscriptionSerializer(
-            data={'user': request.user.id, 'author': author.id},
-            context={'request': request})
+            data={'user': request.user.id,
+                  'author': (get_object_or_404(User, id=user_id)).id},
+                  context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     def delete(self, request, user_id):
-        author = get_object_or_404(User, id=user_id)
-        if not Follow.objects.filter(user=request.user, author=author).exists():
+        if not Follow.objects.filter(user=request.user,
+                                     author=get_object_or_404(User, id=user_id)).exists():
             return Response(
                 {'errors': 'Вы не подписаны на этого пользователя'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -74,12 +75,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
+        if self.request.method in SAFE_METHODS:
             return RecipeReadSerializer
         return RecipeCreateSerializer
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated, ])
+
     def favorite(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
