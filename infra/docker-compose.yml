@@ -26,7 +26,7 @@ services:
       - media:/app/media/
 
   frontend:
-    image: ../frontend
+    build: ../frontend/
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
