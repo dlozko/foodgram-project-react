@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = 'django-insecure-$v%pc&4uu_x#&_k8%y9b79!t3p9l39e96m&t3yacc0pu^26((m'
+# SECRET_KEY = 'django-insecure-$v%pc&4uu_x#&_k8%y9b79!t3p9l39e96m&t3yacc0pu^26((m'
 SECRET_KEY = os.getenv('SECRET_KEY', 'default')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -84,12 +84,12 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-#DATABASES = {
+# DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.sqlite3',
 #        'NAME': BASE_DIR / 'db.sqlite3',
 #    }
-#}
+# }
 
 DATABASES = {
     'default': {
@@ -153,7 +153,7 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated', 
+        'rest_framework.permissions.IsAuthenticated',
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -162,7 +162,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 6,
 }
-#CSRF_TRUSTED_ORIGINS=[]
+# CSRF_TRUSTED_ORIGINS=[]
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
