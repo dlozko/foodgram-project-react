@@ -1,7 +1,5 @@
 import base64
-from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
-from rest_framework.fields import SerializerMethodField
+from rest_framework import serializers, validators, fields
 from django.core.files.base import ContentFile
 
 from django.db import transaction
@@ -22,7 +20,7 @@ class UserNewSerializer(UserCreateSerializer):
 
 class UserSerializer(UserSerializer):
     '''Сериализатор для модели User.'''
-    is_subscribed = SerializerMethodField(read_only=True)
+    is_subscribed = fields.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -46,9 +44,9 @@ class RecipeFavoriteSerializer(serializers.ModelSerializer):
 
 class UserSubscribeListSerializer(UserSerializer):
     """ Сериализатор для получения подписок """
-    is_subscribed = SerializerMethodField(read_only=True)
-    recipes = SerializerMethodField()
-    recipes_count = SerializerMethodField(read_only=True)
+    is_subscribed = fields.SerializerMethodField(read_only=True)
+    recipes = fields.SerializerMethodField()
+    recipes_count = fields.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -76,7 +74,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = ('id', 'user', 'author')
-        validators = [UniqueTogetherValidator(
+        validators = [validators.UniqueTogetherValidator(
             queryset=Follow.objects.all(),
             fields=('user', 'author'),
             message='Подписка уже существует')
@@ -143,8 +141,8 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     ingredients = RecipeIngredientSerializer(read_only=True, many=True,
                                              source='recipeingredients')
-    is_favorited = SerializerMethodField()
-    is_in_shopping_cart = SerializerMethodField()
+    is_favorited = fields.SerializerMethodField()
+    is_in_shopping_cart = fields.SerializerMethodField()
     image = Base64ImageField(required=False)
 
     class Meta:
@@ -240,7 +238,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite
         fields = '__all__'
-        validators = [UniqueTogetherValidator(
+        validators = [validators.UniqueTogetherValidator(
             queryset=Favorite.objects.all(),
             fields=('user', 'recipe'),
             message='Рецепт уже в избранном')]
@@ -256,7 +254,7 @@ class ShoppingListSerializer(serializers.ModelSerializer):
         model = ShoppingList
         fields = '__all__'
         validators = [
-            UniqueTogetherValidator(
+            validators.UniqueTogetherValidator(
                 queryset=ShoppingList.objects.all(),
                 fields=('user', 'recipe'),
                 message='Рецепт уже добавлен в корзину'
