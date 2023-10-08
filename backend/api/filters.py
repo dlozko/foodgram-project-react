@@ -1,17 +1,15 @@
-from django_filters.rest_framework.filters import (BooleanFilter,
-                                                   ModelMultipleChoiceFilter,
-                                                   CharFilter)
-from django_filters.rest_framework import FilterSet
+from django_filters.rest_framework import FilterSet, filters
 from recipes.models import Ingredient, Recipe, Tag
 
 
 class RecipeFilter(FilterSet):
     """Фильтр выборки рецептов по определенным полям."""
-    is_favorited = BooleanFilter(method='get_is_favorited')
-    is_in_shopping_cart = BooleanFilter(
+    is_favorited = filters.BooleanFilter(method='get_is_favorited')
+    is_in_shopping_cart = filters.BooleanFilter(
         method='get_is_in_shopping_cart')
-    tags = ModelMultipleChoiceFilter(queryset=Tag.objects.all(),
-        field_name='tags__slug', to_field_name='slug',)
+    tags = filters.ModelMultipleChoiceFilter(queryset=Tag.objects.all(),
+        field_name='tags__slug', to_field_name='slug',
+    )
 
     class Meta:
         model = Recipe
@@ -29,7 +27,7 @@ class RecipeFilter(FilterSet):
 
 
 class IngredientFilter(FilterSet):
-    name = CharFilter(lookup_expr='istartswith')
+    name = filters.CharFilter(lookup_expr='istartswith')
 
     class Meta:
         model = Ingredient
