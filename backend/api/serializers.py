@@ -1,5 +1,6 @@
-from django.db import transaction
 import base64
+from django.db import transaction
+
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
@@ -7,11 +8,11 @@ from rest_framework.serializers import (ModelSerializer,
                                         SerializerMethodField,
                                         PrimaryKeyRelatedField,
                                         ValidationError, CharField,
-                                        IntegerField, ImageField)                                       
+                                        IntegerField, ImageField)
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.fields import SerializerMethodField
 from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredient,
-                        Favorite, ShoppingList, )
+                        Favorite, ShoppingList)
 from users.models import User, Follow
 
 
@@ -57,7 +58,7 @@ class UserSubscribeListSerializer(UserSerializer):
         fields = ('email', 'id', 'username', 'first_name',
                   'last_name', 'is_subscribed', 'recipes',
                   'recipes_count')
-    
+
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = None
@@ -67,7 +68,7 @@ class UserSubscribeListSerializer(UserSerializer):
         if limit:
             recipes = obj.recipes.all()[:int(limit)]
         serializer = RecipeFavoriteSerializer(recipes, many=True,
-                                     context={'request':request})
+                                              context={'request': request})
         return serializer.data
 
     def get_recipes_count(self, obj):
@@ -81,8 +82,7 @@ class SubscriptionSerializer(ModelSerializer):
         validators = [UniqueTogetherValidator(
             queryset=Follow.objects.all(),
             fields=('user', 'author'),
-            message='Подписка уже существует'
-            )
+            message='Подписка уже существует')
         ]
 
     def validate(self, data):
@@ -133,8 +133,8 @@ class IngredientAddSerializer(ModelSerializer):
 class Base64ImageField(ImageField):
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')  
-            ext = format.split('/')[-1]  
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
 
         return super().to_internal_value(data)
@@ -148,7 +148,6 @@ class RecipeReadSerializer(ModelSerializer):
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
     image = Base64ImageField(required=False)
-
 
     class Meta:
         model = Recipe
@@ -195,7 +194,6 @@ class RecipeCreateSerializer(ModelSerializer):
                     'Есть одинаковые ингредиенты!')
             ingredients_list.append(ingredient.get('id'))
         return data
-
 
     @staticmethod
     def create_ingredients(recipe, ingredients):

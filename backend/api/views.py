@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from .utils import create_object, delete_object
 from .filters import RecipeFilter, IngredientFilter
 from .permissions import IsAuthorAdminOrReadOnly
-from .serializers import (FavoriteSerializer , IngredientSerializer,
+from .serializers import (FavoriteSerializer, IngredientSerializer,
                           TagSerialiser, UserSubscribeListSerializer,
                           SubscriptionSerializer, ShoppingListSerializer,
                           RecipeCreateSerializer, RecipeReadSerializer)
@@ -29,7 +29,7 @@ class UserSubscribeView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
     def delete(self, request, user_id):
         if not Follow.objects.filter(user=request.user,
                                      author=get_object_or_404(User, id=user_id)).exists():
@@ -81,7 +81,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated, ])
-
     def favorite(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
@@ -90,7 +89,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'DELETE':
             error_message = 'В избранном нет такого рецепта'
             return delete_object(request, Favorite, recipe, error_message)
-        
+
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated, ]
     )
