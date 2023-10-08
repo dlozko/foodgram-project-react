@@ -30,7 +30,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'default')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['158.160.73.232', '127.0.0.1', 'localhost', 'https://dlozk.ddns.net']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split()
+#ALLOWED_HOSTS = ['158.160.73.232', '127.0.0.1', 'localhost', 'https://dlozk.ddns.net']
 
 APPEND_SLASH = True
 
