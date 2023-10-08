@@ -15,7 +15,7 @@ from .serializers import (FavoriteSerializer, IngredientSerializer,
                           SubscriptionSerializer, ShoppingListSerializer,
                           RecipeCreateSerializer, RecipeReadSerializer)
 from recipes.models import (Ingredient, Tag, Recipe, Favorite, ShoppingList,
-                        RecipeIngredient)
+                            RecipeIngredient)
 from users.models import Follow, User
 
 
@@ -25,14 +25,15 @@ class UserSubscribeView(APIView):
         serializer = SubscriptionSerializer(
             data={'user': request.user.id,
                   'author': (get_object_or_404(User, id=user_id)).id},
-                  context={'request': request})
+            context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, user_id):
-        if not Follow.objects.filter(user=request.user,
-                                     author=get_object_or_404(User, id=user_id)).exists():
+        if not Follow.objects.filter(
+                user=request.user,
+                author=get_object_or_404(User, id=user_id)).exists():
             return Response(
                 {'errors': 'Вы не подписаны на этого пользователя'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -91,8 +92,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return delete_object(request, Favorite, recipe, error_message)
 
     @action(detail=True, methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated, ]
-    )
+            permission_classes=[IsAuthenticated, ])
     def shopping_cart(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
@@ -103,8 +103,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return delete_object(request, ShoppingList, recipe, error_message)
 
     @action(detail=False, methods=['get'],
-            permission_classes=[IsAuthenticated, ]
-    )
+            permission_classes=[IsAuthenticated, ])
     def download_shopping_cart(self, request):
         ingredient_lst = RecipeIngredient.objects.filter(
             recipe__carts__user=request.user

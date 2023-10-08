@@ -4,6 +4,7 @@ from django.db import models
 
 from rest_framework.exceptions import ValidationError
 
+
 class User(AbstractUser):
     username = models.CharField('Имя пользователя',
                                 max_length=150,
@@ -40,7 +41,7 @@ class User(AbstractUser):
         if not bool(re.match(r'^[\w.@+-]+$', self.username)):
             raise ValidationError(
                 'Некорректные символы в username')
-    
+
     def __str__(self):
         return f'Пользователь {self.username}'
 
@@ -60,6 +61,6 @@ class Follow(models.Model):
         verbose_name_plural = 'Подписки'
         constraints = [models.UniqueConstraint(
             fields=['user', 'author'], name='unique_user_author')]
-    
+
     def __str__(self):
         return f'{self.user.username} подписан на {self.author.username}'

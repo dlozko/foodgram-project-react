@@ -6,6 +6,7 @@ from django.core.management import BaseCommand, CommandError
 
 MODELS_FIELDS = {}
 
+
 class Command(BaseCommand):
     help = 'Creating model objects according the file path specified'
 
@@ -20,8 +21,7 @@ class Command(BaseCommand):
                 for row in reader:
                     name, measurement_unit = row
                     Ingredient.objects.get_or_create(
-                            name=name, measurement_unit=measurement_unit
-                    )
+                        name=name, measurement_unit=measurement_unit)
                 self.stdout.write(
                     self.style.SUCCESS('Ингредиенты загружены')
                 )

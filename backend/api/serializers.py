@@ -111,8 +111,8 @@ class TagSerialiser(serializers.ModelSerializer):
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True, source='ingredient.id')
     name = serializers.harField(read_only=True, source='ingredient.name')
-    measurement_unit = serializers.CharField(read_only=True,
-                                             source='ingredient.measurement_unit')
+    measurement_unit = serializers.CharField(
+        read_only=True, source='ingredient.measurement_unit')
 
     class Meta:
         model = RecipeIngredient
@@ -198,8 +198,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def create_ingredients(recipe, ingredients):
         ingredient_liist = []
         for ingredient_data in ingredients:
-            current_ingredient = get_object_or_404(Ingredient,
-                                                   id=ingredient_data.get('id'))
+            current_ingredient = get_object_or_404(
+                Ingredient, id=ingredient_data.get('id'))
             ingredient_liist.append(
                 RecipeIngredient(
                     ingredient=current_ingredient,
@@ -232,9 +232,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return instance
 
     def to_representation(self, instance):
-        return RecipeReadSerializer(instance,
-                                    context={'request': self.context.get('request')
-                                             }).data
+        return RecipeReadSerializer(
+            instance, context={'request': self.context.get('request')}).data
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
