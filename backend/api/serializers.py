@@ -1,8 +1,8 @@
 import base64
-from django.core.files.base import ContentFile
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.fields import SerializerMethodField
+from django.core.files.base import ContentFile
 
 from django.db import transaction
 from django.shortcuts import get_object_or_404
