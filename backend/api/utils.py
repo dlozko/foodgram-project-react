@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 
 def create_object(request, instance, serializer_name):
+    """ Функция добавления рецептов."""
     serializer = serializer_name(data={'user': request.user.id,
                                        'recipe': instance.id, },
                                  context={'request': request})
@@ -12,6 +13,7 @@ def create_object(request, instance, serializer_name):
 
 
 def delete_object(request, model_name, instance, error_message):
+    """ Функция удаления рецептов."""
     if not model_name.objects.filter(user=request.user,
                                      recipe=instance).exists():
         return Response(

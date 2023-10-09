@@ -20,6 +20,7 @@ from users.models import Follow, User
 
 
 class UserSubscribeView(APIView):
+    """ Вью добавления, удаления подписки на пользователя."""
 
     def post(self, request, user_id):
         serializer = SubscriptionSerializer(
@@ -44,6 +45,7 @@ class UserSubscribeView(APIView):
 
 class UserSubscriptionsViewSet(mixins.ListModelMixin,
                                viewsets.GenericViewSet):
+    """ Вьюсет получения списка подписок на пользователя."""
     serializer_class = UserSubscribeListSerializer
 
     def get_queryset(self):
@@ -51,7 +53,7 @@ class UserSubscriptionsViewSet(mixins.ListModelMixin,
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    """Вьюсет для получения ингердиентов."""
+    """ Вьюсет получения ингердиентов."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny, )
@@ -61,7 +63,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
-    """Вьюсет для получения тегов."""
+    """ Вьюсет получения тегов."""
     queryset = Tag.objects.all()
     serializer_class = TagSerialiser
     permission_classes = (AllowAny, )
@@ -69,6 +71,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    """ Вьюсет работы с рецептами."""
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorAdminOrReadOnly, )
     filter_backends = (DjangoFilterBackend, )
