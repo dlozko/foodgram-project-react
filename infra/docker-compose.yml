@@ -12,13 +12,13 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data/
     env_file:
-      - ../.env
+      - ./.env
 
   backend:
     image: dlozko76/foodgram_backend
     restart: always
     env_file:
-      - ../.env
+      - ./.env
     depends_on:
       - db
     volumes:

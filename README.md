@@ -11,32 +11,53 @@ https://dlozk.ddns.net/
 - Gunicorn
 - Docker
 
-### Запуск проекта
+### Запуск проекта:
 - Клонировать репозиторий
 ```
 git@github.com:dlozko/foodgram-project-react.git
 ```
-- Перейти в директорию infra
-```
-cd foodgram-project-react/infra
-```
-- В папке infra выполните команду 
-```
-docker-compose up
-```
-- При выполнении этой команде сервис frontend, описанный в docker-compose.yml подготовит файлы, необходимые для работы фронтенд-приложения, а затем прекратит свою работу.
-### После запуска увидеть спецификацию API вы сможете по адресу:
-```
- http://localhost/api/docs/
-```
-
-### Backend
+- Перейти в директорию foodgram-project-react.git
 ```
 cd foodgram-project-react
 ```
+### -При запуске проекта локально в контейнерах:
+- Перейти в директорию infra
+```
+cd infra
+```
+- Запустить docker-compose:
+```
+docker-compose up
+```
+- После сборки контейнеров выполнить миграции:
+```
+docker-compose exec backend python manage.py migrate
+```
+- Создать суперпользователя:
+```
+docker-compose exec backend python createsuperuser
+```
+- Загрузить статику:
+```
+docker-compose exec backend python collectstatic --no-input
+```
+- Загрузить ингредиенты:
+```
+docker-compose exec backend python manage.py load_ingredients --path data/ingredients.csv
+```
+- Загрузить ингредиенты:
+```
+docker-compose exec backend python manage.py load_ingredients --path data/
+ingredients.csv
+```
+- Проверить работу foodgram по ссылке:
+http://localhost/api/docs/
+
+### -При запуске проекта локально:
+### Backend
 - Cоздать и активировать виртуальное окружение:
 ```
-python -m venv env
+python -m venv venv
 ```
 ```
 source venv/Scripts/activate
