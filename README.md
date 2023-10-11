@@ -45,11 +45,6 @@ docker-compose exec backend python collectstatic --no-input
 ```
 docker-compose exec backend python manage.py load_ingredients --path data/ingredients.csv
 ```
-- Загрузить ингредиенты:
-```
-docker-compose exec backend python manage.py load_ingredients --path data/
-ingredients.csv
-```
 - Проверить работу foodgram по ссылке:
 http://localhost/api/docs/
 
@@ -77,267 +72,83 @@ python3 manage.py migrate
 ```
 python3 manage.py runserver
 ```
-### Приложения
-- Создайте приложения согласно спецификации API
-### Модели 
-- Создайте модели согласно спецификации API
-### ViewSets
-- Во вьюсетах вам потребуется добавлять дополнительные action
-### Serializers
-- Сериализаторы должны соовествовать требованиям
+#### В API доступны следующие эндпоинты:
+Доступно без токена:
+* ```/api/users/```  Get-запрос – получение списка пользователей. POST-запрос – регистрация нового пользователя.
 
-### Запустите миграции
-```
-python manage.py makemigrations
-python manage.py migrate
-```
-### Создание суперюзера
-```
-python manage.py createsuperuser
-```
-### Примеры
-- Список пользователей
-```
-GET http://127.0.0.1:8000/api/users/
-```
-```
-{
-  "count": 123,
-  "next": "http://foodgram.example.org/api/users/?page=4",
-  "previous": "http://foodgram.example.org/api/users/?page=2",
-  "results": [
-    {
-      "email": "user@example.com",
-      "id": 0,
-      "username": "string",
-      "first_name": "Вася",
-      "last_name": "Пупкин",
-      "is_subscribed": false
-    }
-  ]
-}
-```
-- Регистрация пользователя
-```
-POST http://127.0.0.1:8000/api/users/
-```
-```
-{
-  "email": "vpupkin@yandex.ru",
-  "username": "vasya.pupkin",
-  "first_name": "Вася",
-  "last_name": "Пупкин",
-  "password": "Qwerty123"
-}
-```
-- Изменение пароля
-```
-POST http://127.0.0.1:8000/api/users/set_password/
-```
-```
-{
-  "new_password": "string",
-  "current_password": "string"
-}
-```
-- Cписок тегов
-```
-GET http://127.0.0.1:8000/api/tags/
-```
-```
-[
-  {
-    "id": 0,
-    "name": "Завтрак",
-    "color": "#E26C2D",
-    "slug": "breakfast"
-  }
-]
-```
-- Получение тега
-```
-POST http://127.0.0.1:8000/api/tags/{id}/
-```
-```
-{
-  "id": 0,
-  "name": "Завтрак",
-  "color": "#E26C2D",
-  "slug": "breakfast"
-}
-```
-- Список рецептов
-```
-GET  http://127.0.0.1:8000/api/recipes/
-```
-```
-{
-  "count": 123,
-  "next": "http://foodgram.example.org/api/recipes/?page=4",
-  "previous": "http://foodgram.example.org/api/recipes/?page=2",
-  "results": [
-    {
-      "id": 0,
-      "tags": [
-        {
-          "id": 0,
-          "name": "Завтрак",
-          "color": "#E26C2D",
-          "slug": "breakfast"
-        }
-      ],
-      "author": {
-        "email": "user@example.com",
-        "id": 0,
-        "username": "string",
-        "first_name": "Вася",
-        "last_name": "Пупкин",
-        "is_subscribed": false
-      },
-      "ingredients": [
-        {
-          "id": 0,
-          "name": "Картофель отварной",
-          "measurement_unit": "г",
-          "amount": 1
-        }
-      ],
-      "is_favorited": true,
-      "is_in_shopping_cart": true,
-      "name": "string",
-      "image": "http://foodgram.example.org/media/recipes/images/image.jpeg",
-      "text": "string",
-      "cooking_time": 1
-    }
-  ]
-}
-```
-- Скачать список покупок
-```
-GET http://127.0.0.1:8000/api/recipes/download_shopping_cart/
-```
-```
-{
-  "detail": "Учетные данные не были предоставлены."
-}
-```
-- Добавить рецепт в избранное
-```
-POST http://127.0.0.1:8000/api/recipes/{id}/favorite/
-```
-```
-{
-  "id": 0,
-  "name": "string",
-  "image": "http://foodgram.example.org/media/recipes/images/image.jpeg",
-  "cooking_time": 1
-}
-```
-- Мои подписки
-```
- http://127.0.0.1:8000/api/users/subscriptions/
-```
-```
-{
-  "count": 123,
-  "next": "http://foodgram.example.org/api/users/subscriptions/?page=4",
-  "previous": "http://foodgram.example.org/api/users/subscriptions/?page=2",
-  "results": [
-    {
-      "email": "user@example.com",
-      "id": 0,
-      "username": "string",
-      "first_name": "Вася",
-      "last_name": "Пупкин",
-      "is_subscribed": true,
-      "recipes": [
-        {
-          "id": 0,
-          "name": "string",
-          "image": "http://foodgram.example.org/media/recipes/images/image.jpeg",
-          "cooking_time": 1
-        }
-      ],
-      "recipes_count": 0
-    }
-  ]
-}
-```
-- Список ингредиентов
-```
-GET http://127.0.0.1:8000/api/ingredients/
-```
-```
-[
-  {
-    "id": 0,
-    "name": "Капуста",
-    "measurement_unit": "кг"
-  }
-]
-```
-### Запуск локально 
-- Собираем контейнерыы:
-- Из папки infra/ разверните контейнеры при помощи docker-compose:
-```
-docker-compose up -d --build
-```
-- Выполните миграции:
-```
-docker-compose exec backend python manage.py migrate
-```
-- Создайте суперпользователя:
-```
-winpty docker-compose exec backend python manage.py createsuperuser
-```
-- Соберите статику:
-```
-docker-compose exec backend python manage.py collectstatic --no-input
-```
-- Наполните базу данных ингредиентами и тегами. Выполняйте команду из дериктории где находится файл manage.py:
-```
-docker-compose exec backend python manage.py load_ingredients
-```
-- Остановка проекта:
-```
-docker-compose down
-```
-### Запустить проект на боевом сервере:
+* ```/api/users/{id}``` GET-запрос – страница пользователя с указанным id.
+
+* ```/api/tags/``` GET-запрос — получение списка тегов.
+
+* ```/api/tags/{id}``` GET-запрос — получение информации о теге по его id.
+
+* ```/api/ingredients/``` GET-запрос – получение списка ингредиентов.
+
+* ```/api/ingredients/{id}/``` GET-запрос — получение информации об ингредиенте по id.
+
+* ```/api/recipes/``` GET-запрос – получение списка всех рецептов.
+
+* ```/api/recipes/{id}/``` GET-запрос – получение информации о рецепте по id.
+
+* ```/api/users/me/``` GET-запрос – страница текущего пользователя. PATCH-запрос – редактирование своей страницы.
+
+* ```/api/users/set_password``` POST-запрос – изменение пароля.
+
+* ```/api/recipes/``` POST-запрос – добавление нового рецепта.
+
+* ```/api/recipes/?is_favorited=1``` GET-запрос – получение списка рецептов, добавленных в избранное. 
+
+* ```/api/recipes/is_in_shopping_cart=1``` GET-запрос – получение списка рецептов, добавленных в покупки.
+
+* ```/api/recipes/{id}/``` PATCH-запрос – изменение собственного рецепта (доступно для автора рецепта). DELETE-запрос – удаление собственного рецепта.
+
+* ```/api/recipes/{id}/favorite/``` POST-запрос – добавление рецепта в избранное. DELETE-запрос – удаление рецепта из избранного.
+
+* ```/api/recipes/{id}/shopping_cart/``` POST-запрос – добавление нового рецепта в покупки. DELETE-запрос – удаление рецепта из покупок.
+
+* ```/api/recipes/download_shopping_cart/``` GET-запрос – получение txt. файла со списком покупок.
+
+* ```/api/users/{id}/subscribe/``` GET-запрос – подписка на пользователя по id. POST-запрос – отписка от пользователя по id.
+
+* ```/api/users/subscriptions/``` GET-запрос – получение списка пользователей, на которых подписан пользователь.
+
+### При запуске проекта на сервере:
 - Установить на сервере docker и docker-compose. Скопировать на сервер файлы docker-compose.yaml и default.conf:
 - Cоздать и заполнить .env файл в директории infra
 ```
-DB_ENGINE=django.db.backends.postgresql
-DB_NAME=postgres
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
+SECRET_KEY = секретный ключ
+POSTGRES_DB=postgres
+POSTGRES_USER=foodgram_user
+POSTGRES_PASSWORD=foodgram_password
 DB_HOST=db
 DB_PORT=5432
-TOKEN=252132607137
+DB_NAME=foodgram
+DEBUG=True
 ALLOWED_HOSTS=*
 ```
 - После успешного запуска контрейнеров боевом сервере должны будут выполнены следующие команды:
 ```
-sudo docker-compose exec web python manage.py migrate
+sudo docker-compose exec backend python manage.py migrate
 ```
 ```
-sudo docker-compose exec web python manage.py collectstatic --no-input 
+sudo docker-compose exec backend python manage.py collectstatic
 ```
 Затем необходимо будет создать суперюзера и загрузить в базу данных информацию об ингредиентах:
 ```
-sudo docker-compose exec web python manage.py createsuperuser
+sudo docker-compose exec backend python manage.py createsuperuser
 ```
 ```
-sudo docker-compose exec web python manage.py load_ingredients
+sudo docker-compose exec backend python manage.py load_ingredients --path data/ingredients.csv
 ```
 ### Проект доступен по ссылке:
 ```
-https://foodgram.servegame.com/
+https://dlozk.ddns.net/
 Проект доступен по ссылке:
 
 ```
 
 ### Автор
-- Михаил Корюкин
+- Денис Лозко
 ```
-https://github.com/Kom1969
+https://github.com/dlozko
 ```
