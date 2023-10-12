@@ -14,7 +14,7 @@ from .serializers import (
     RecipeCreateSerializer, RecipeReadSerializer,
     ShoppingListSerializer, SubscriptionSerializer,
     TagSerialiser, UserSubscribeListSerializer)
-from .utils import create_object, delete_object
+#from .utils import create_object, delete_object
 from recipes.models import (Ingredient, Tag, Recipe, Favorite, ShoppingList,
                             RecipeIngredient)
 from users.models import Follow, User
@@ -89,16 +89,36 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
-            return create_object(request, recipe, FavoriteSerializer)
-        return delete_object(request, Favorite, recipe)
+            return self.create_object(request, recipe, FavoriteSerializer)
+        return self.delete_object(request, Favorite, recipe)
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated, ])
     def shopping_cart(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
-            return create_object(request, recipe, ShoppingListSerializer)
-        return delete_object(request, ShoppingList, recipe)
+            return self.create_object(request, recipe)
+        return self.delete_object(request, ShoppingList, recipe,
+                             ShoppingListSerializer)
+    
+    def create_object(request, instance, serializer_name):
+        """ Функция добавления рецептов."""
+        serializer = serializer_name(data={'user': request.user.id,
+                                           'recipe': instance.id, },
+                                     context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete_object(request, model_name, instance):
+        """ Функция удаления рецептов."""
+        if not model_name.objects.filter(user=request.user,
+                                         recipe=instance).exists():
+            return Response(
+                {'errors': 'Нет такого рецепта'},
+                status=status.HTTP_404_BAD_REQUEST)
+        model_name.objects.filter(user=request.user, recipe=instance).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated, ])
