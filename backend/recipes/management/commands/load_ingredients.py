@@ -1,8 +1,8 @@
 import csv
 
-from recipes.models import Ingredient
 from django.core.management import BaseCommand, CommandError
 
+from recipes.models import Ingredient
 
 MODELS_FIELDS = {}
 
