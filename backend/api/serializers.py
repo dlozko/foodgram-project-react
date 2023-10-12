@@ -1,16 +1,14 @@
-import base64
-
-from django.core.files.base import ContentFile
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework.serializers import (ModelSerializer,
                                         PrimaryKeyRelatedField,
                                         ValidationError, CharField,
-                                        IntegerField, ImageField)
+                                        IntegerField)
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.fields import SerializerMethodField
 
+from .fields import Base64ImageField
 from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredient,
                             Favorite, ShoppingList)
 from users.models import Follow, User
@@ -137,18 +135,6 @@ class IngredientAddSerializer(ModelSerializer):
         fields = ('id', 'amount')
 
 
-class Base64ImageField(ImageField):
-    """ Сериализатор получения изображения в кодировке."""
-
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-
-        return super().to_internal_value(data)
-
-
 class RecipeReadSerializer(ModelSerializer):
     """ Сериализатор получения информации о рецепте."""
     tags = TagSerialiser(read_only=True, many=True)
@@ -208,18 +194,18 @@ class RecipeCreateSerializer(ModelSerializer):
 
     @staticmethod
     def create_ingredients(recipe, ingredients):
-        ingredient_liist = []
+        ingredient_list = []
         for ingredient_data in ingredients:
             current_ingredient = get_object_or_404(
                 Ingredient, id=ingredient_data.get('id'))
-            ingredient_liist.append(
+            ingredient_list.append(
                 RecipeIngredient(
                     ingredient=current_ingredient,
                     amount=ingredient_data.get('amount'),
                     recipe=recipe,
                 )
             )
-        RecipeIngredient.objects.bulk_create(ingredient_liist)
+        RecipeIngredient.objects.bulk_create(ingredient_list)
 
     @transaction.atomic
     def create(self, validated_data):

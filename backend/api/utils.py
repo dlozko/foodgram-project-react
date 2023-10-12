@@ -12,12 +12,12 @@ def create_object(request, instance, serializer_name):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-def delete_object(request, model_name, instance, error_message):
+def delete_object(request, model_name, instance):
     """ Функция удаления рецептов."""
     if not model_name.objects.filter(user=request.user,
                                      recipe=instance).exists():
         return Response(
-            {'errors': error_message},
+            {'errors': 'Нет такого рецепта'},
             status=status.HTTP_404_BAD_REQUEST)
     model_name.objects.filter(user=request.user, recipe=instance).delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

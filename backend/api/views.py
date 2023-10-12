@@ -90,10 +90,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
             return create_object(request, recipe, FavoriteSerializer)
-
-        if request.method == 'DELETE':
-            error_message = 'В избранном нет такого рецепта'
-            return delete_object(request, Favorite, recipe, error_message)
+        return delete_object(request, Favorite, recipe)
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated, ])
@@ -101,10 +98,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
             return create_object(request, recipe, ShoppingListSerializer)
+        return delete_object(request, ShoppingList, recipe)
 
-        if request.method == 'DELETE':
-            error_message = 'В корзине нет такого рецепта'
-            return delete_object(request, ShoppingList, recipe, error_message)
+#    @action(detail=True, methods=['post', 'delete'],
+#            permission_classes=[IsAuthenticated, ])
+#    def favorite(self, request, pk):
+#        recipe = get_object_or_404(Recipe, id=pk)
+#        if request.method == 'POST':
+#            return create_object(request, recipe, FavoriteSerializer)
+#
+#        if request.method == 'DELETE':
+#            error_message = 'В избранном нет такого рецепта'
+#            return delete_object(request, Favorite, recipe, error_message)
+
+#    @action(detail=True, methods=['post', 'delete'],
+#            permission_classes=[IsAuthenticated, ])
+#    def shopping_cart(self, request, pk):
+#        recipe = get_object_or_404(Recipe, id=pk)
+#        if request.method == 'POST':
+#            return create_object(request, recipe, ShoppingListSerializer)
+#
+#        if request.method == 'DELETE':
+#            error_message = 'В корзине нет такого рецепта'
+#            return delete_object(request, ShoppingList, recipe, error_message)
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated, ])
@@ -121,6 +137,5 @@ class RecipeViewSet(viewsets.ModelViewSet):
             amount = ingredient['ingredient_amount']
             shopping_lst.append(f'\n{name} - {amount}, {unit}')
         response = HttpResponse(shopping_lst, content_type='text/plain')
-        response['Content-Disposition'] = \
-            'attachment; filename="shopping_cart.txt"'
+        response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"'
         return response
