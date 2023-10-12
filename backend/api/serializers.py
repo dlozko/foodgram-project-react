@@ -1,18 +1,19 @@
 import base64
+
+from django.core.files.base import ContentFile
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework.serializers import (ModelSerializer,
                                         PrimaryKeyRelatedField,
                                         ValidationError, CharField,
                                         IntegerField, ImageField)
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.fields import SerializerMethodField
-from django.core.files.base import ContentFile
 
-from django.db import transaction
-from django.shortcuts import get_object_or_404
-from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredient,
                             Favorite, ShoppingList)
-from users.models import User, Follow
+from users.models import Follow, User
 
 
 class UserNewSerializer(UserCreateSerializer):
