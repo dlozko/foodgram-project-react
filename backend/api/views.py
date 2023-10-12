@@ -100,7 +100,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return self.create_object(request, recipe, ShoppingListSerializer)
         return self.delete_object(request, ShoppingList, recipe)
 
-    def create_object(request, instance, serializer_name):
+    def create_object(self, request, instance, serializer_name):
         """ Функция добавления рецептов."""
         serializer = serializer_name(data={'user': request.user.id,
                                            'recipe': instance.id, },
@@ -109,7 +109,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def delete_object(request, model_name, instance):
+    def delete_object(self, request, model_name, instance):
         """ Функция удаления рецептов."""
         if not model_name.objects.filter(user=request.user,
                                          recipe=instance).exists():
