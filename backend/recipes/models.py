@@ -83,6 +83,7 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
+    """ Модель для связи ингредиента и рецепта. """
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -108,6 +109,10 @@ class RecipeIngredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент рецепта'
         verbose_name_plural = 'Ингредиенты рецепта'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='recipe_ingredient_unique')]
 
 
 class Favorite(models.Model):
