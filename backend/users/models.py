@@ -33,15 +33,6 @@ class User(AbstractUser):
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
-    def clean(self):
-        if self.username == 'me':
-            raise ValidationError(
-                {'error': 'Невозможно создать пользователя с именем me'})
-
-        if not bool(re.match(r'^[\w.@+-]+$', self.username)):
-            raise ValidationError(
-                'Некорректные символы в username')
-
     def __str__(self):
         return f'Пользователь {self.username}'
 
