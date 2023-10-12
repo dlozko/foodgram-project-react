@@ -1,8 +1,8 @@
-#from rest_framework import status
-#from rest_framework.response import Response
+# from rest_framework import status
+# from rest_framework.response import Response
 
 
-#def create_object(request, instance, serializer_name):
+# def create_object(request, instance, serializer_name):
 #    """ Функция добавления рецептов."""
 #    serializer = serializer_name(data={'user': request.user.id,
 #                                       'recipe': instance.id, },
@@ -12,7 +12,7 @@
 #    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-#def delete_object(request, model_name, instance):
+# def delete_object(request, model_name, instance):
 #    """ Функция удаления рецептов."""
 #    if not model_name.objects.filter(user=request.user,
 #                                     recipe=instance).exists():
