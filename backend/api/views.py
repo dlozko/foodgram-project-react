@@ -97,9 +97,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
-            return self.create_object(request, recipe)
-        return self.delete_object(request, ShoppingList, recipe,
-                                  ShoppingListSerializer)
+            return self.create_object(request, recipe, ShoppingListSerializer)
+        return self.delete_object(request, ShoppingList, recipe)
 
     def create_object(request, instance, serializer_name):
         """ Функция добавления рецептов."""
