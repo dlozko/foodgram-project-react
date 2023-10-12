@@ -14,7 +14,6 @@ from .serializers import (
     RecipeCreateSerializer, RecipeReadSerializer,
     ShoppingListSerializer, SubscriptionSerializer,
     TagSerialiser, UserSubscribeListSerializer)
-# from .utils import create_object, delete_object
 from recipes.models import (Ingredient, Tag, Recipe, Favorite, ShoppingList,
                             RecipeIngredient)
 from users.models import Follow, User
@@ -101,7 +100,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return self.delete_object(request, ShoppingList, recipe)
 
     def create_object(self, request, instance, serializer_name):
-        """ Функция добавления рецептов."""
+        """ Функция добавления рецептов в избранное и корзину."""
         serializer = serializer_name(data={'user': request.user.id,
                                            'recipe': instance.id, },
                                      context={'request': request})
@@ -110,7 +109,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete_object(self, request, model_name, instance):
-        """ Функция удаления рецептов."""
+        """ Функция удаления рецептов из избранного и корзины."""
         if not model_name.objects.filter(user=request.user,
                                          recipe=instance).exists():
             return Response(
