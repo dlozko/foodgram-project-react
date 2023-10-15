@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework.serializers import (ModelSerializer,
                                         PrimaryKeyRelatedField,
@@ -197,7 +198,8 @@ class RecipeCreateSerializer(ModelSerializer):
         for ingredient_data in ingredients:
             ingredient_list.append(
                 RecipeIngredient(
-                    ingredient=ingredient_data['id'],
+                    ingredient=get_object_or_404(Ingredient,
+                                                 id=ingredient_data.get('id')),
                     amount=ingredient_data.get('amount'),
                     recipe=recipe,
                 )
