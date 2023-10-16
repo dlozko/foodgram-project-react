@@ -18,29 +18,35 @@ from recipes.models import (Ingredient, Tag, Recipe, Favorite, ShoppingList,
                             RecipeIngredient)
 from users.models import Follow, User
 
-
 class UserSubscribeView(APIView):
     """ Вью добавления, удаления подписки на пользователя."""
 
     def post(self, request, user_id):
-        serializer = SubscriptionSerializer(
-            data={'user': request.user.id,
-                  'author': (get_object_or_404(User, id=user_id)).id},
-            context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return self.toggle_subscription(request, user_id, add=True)
 
     def delete(self, request, user_id):
-        if not Follow.objects.filter(
-                user=request.user,
-                author=get_object_or_404(User, id=user_id)).exists():
-            return Response(
-                {'errors': 'Вы не подписаны на этого пользователя'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        Follow.objects.get(user=request.user.id, author=user_id).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return self.toggle_subscription(request, user_id, add=False)
+
+    def toggle_subscription(self, request, user_id, add=True):
+        author = get_object_or_404(User, id=user_id)
+        filter_params = {'user': request.user, 'author': author}
+        
+        if add:
+            serializer = SubscriptionSerializer(data=filter_params, context={'request': request})
+        else:
+            serializer = SubscriptionSerializer(data=filter_params)
+
+        if add and not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif not add and not Follow.objects.filter(**filter_params).exists():
+            return Response({'errors': 'Вы не подписаны на этого пользователя'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if add:
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            Follow.objects.get(**filter_params).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserSubscriptionsViewSet(mixins.ListModelMixin,
