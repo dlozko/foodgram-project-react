@@ -18,6 +18,7 @@ from recipes.models import (Ingredient, Tag, Recipe, Favorite, ShoppingList,
                             RecipeIngredient)
 from users.models import Follow, User
 
+
 class UserSubscribeView(APIView):
     """ Вью добавления, удаления подписки на пользователя."""
 
@@ -30,16 +31,19 @@ class UserSubscribeView(APIView):
     def toggle_subscription(self, request, user_id, add=True):
         author = get_object_or_404(User, id=user_id)
         filter_params = {'user': request.user, 'author': author}
-        
+
         if add:
-            serializer = SubscriptionSerializer(data=filter_params, context={'request': request})
+            serializer = SubscriptionSerializer(data=filter_params,
+                                                context={'request': request})
         else:
             serializer = SubscriptionSerializer(data=filter_params)
 
         if add and not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
         elif not add and not Follow.objects.filter(**filter_params).exists():
-            return Response({'errors': 'Вы не подписаны на этого пользователя'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'errors': 'Вы не подписаны на этого пользователя'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         if add:
             serializer.save()
