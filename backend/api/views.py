@@ -42,8 +42,9 @@ class UserSubscribeView(APIView):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
         elif not add and not Follow.objects.filter(**filter_params).exists():
-            return Response({'errors': 'Вы не подписаны на этого пользователя'},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'errors': 'Вы не подписаны на этого пользователя'},
+                status=status.HTTP_400_BAD_REQUEST)
 
         if add:
             serializer.save()
