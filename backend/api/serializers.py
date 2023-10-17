@@ -263,4 +263,3 @@ class ShoppingListSerializer(ModelSerializer):
         return RecipeFavoriteSerializer(
             instance.recipe,
             context={'request': self.context.get('request')}).data
-    
