@@ -1,7 +1,13 @@
 https://dlozk.ddns.net/
 Администратор:
-Логин: admin
-Пароль: admin
+Логин:
+```
+admin
+```
+Пароль:
+```
+admin
+```
 # Проект — Foodgram
 ## Онлайн-сервис «Продуктовый помощник»
 ### Описание
@@ -147,6 +153,7 @@ sudo docker-compose exec backend python manage.py load_ingredients --path data/i
 ### Проект доступен по ссылке:
 ```
 https://dlozk.ddns.net/
+
 Проект доступен по ссылке:
 ```
 ### Автор
