@@ -77,7 +77,7 @@ class SubscriptionSerializer(ModelSerializer):
     """ Сериализатор для подписки, отписки."""
     class Meta:
         model = Follow
-        fields = ('id', 'user', 'author')
+        fields = ('user', 'author')
         validators = [UniqueTogetherValidator(
             queryset=Follow.objects.all(),
             fields=('user', 'author'),
@@ -234,7 +234,7 @@ class FavoriteSerializer(ModelSerializer):
     """ Сериализатор избранных рецептов."""
     class Meta:
         model = Favorite
-        fields = '__all__'
+        fields = ('user', 'recipe')
         validators = [UniqueTogetherValidator(
             queryset=Favorite.objects.all(),
             fields=('user', 'recipe'),
@@ -250,7 +250,7 @@ class ShoppingListSerializer(ModelSerializer):
     """ Сериализатор покупки ингредиентов."""
     class Meta:
         model = ShoppingList
-        fields = '__all__'
+        fields = ('user', 'recipe')
         validators = [
             UniqueTogetherValidator(
                 queryset=ShoppingList.objects.all(),
@@ -263,3 +263,4 @@ class ShoppingListSerializer(ModelSerializer):
         return RecipeFavoriteSerializer(
             instance.recipe,
             context={'request': self.context.get('request')}).data
+    
