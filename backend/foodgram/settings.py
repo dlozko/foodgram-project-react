@@ -9,7 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'default')
 
-DEBUG = os.getenv('DEBUG', default=False)
+DEBUG = False
+#DEBUG = os.getenv('DEBUG', default=False)
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split()
 
@@ -119,7 +120,7 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticateds',
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
